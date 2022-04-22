@@ -21,10 +21,12 @@ pipeline {
         stage ('run docker container'){
                 agent any
                 steps{
-        
-        sh '''docker build -t mywebbox . && docker login -u admin -p yura325bn 10.128.0.4:8123 && docker tag mywebbox 10.128.0.4:8123/mywebbox'''
-                sh '''docker push 10.128.0.4:8123/mywebbox && docker run -d -p 8081:8080 10.128.0.4:8123/mywebbox'''
-       
+        sh 'ssh-keyscan -H vm3 >> ~/.ssh/known_hosts'
+        sh '''ssh jenkins@vm3 << EOF
+       docker login -u admin -p yura325bn 10.128.0.4:8123
+       docker pull 10.128.0.4:8123/mywebbox
+       docker run -d -p 8080:8080 10.128.0.4:8123/mywebbox
+       EOF'''
         }
     }
     }
